@@ -1,34 +1,15 @@
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
 import requests
 from urllib.request import urlopen
+from buil_download_video_request import build_download_video_request
 
 def downloadVideo(link, id):
     print(f"Downloading video {id} from: {link}")
-    cookies = {
-        # Please get this data from the console network activity tool
-        # This is explained in the video :)
-    }
-
-    headers = {
-        # Please get this data from the console network activity tool
-        # This is explained in the video :)
-    }
-
-    params = {
-        'url': 'dl',
-    }
-
-    data = {
-        'id': link,
-        'locale': 'en',
-        'tt': '', # NOTE: This value gets changed, please use the value that you get when you copy the curl command from the network console
-    }
-    
-    print("STEP 4: Getting the download link")
-    print("If this step fails, PLEASE read the steps above")
-    response = requests.post('https://ssstik.io/abc', params=params, cookies=cookies, headers=headers, data=data)
+    download_vid_req = build_download_video_request(link)
+    response = requests.post('https://ssstik.io/abc', params=download_vid_req["params"], cookies=download_vid_req["cookies"], headers=download_vid_req["headers"], data=download_vid_req["data"])
     downloadSoup = BeautifulSoup(response.text, "html.parser")
 
     downloadLink = downloadSoup.a["href"]
@@ -52,7 +33,7 @@ options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 driver = webdriver.Chrome(options=options)
 # Change the tiktok link
-driver.get("https://www.tiktok.com/@papayaho.cat")
+driver.get("https://www.tiktok.com/@mikaylademaiterr")
 
 # IF YOU GET A TIKTOK CAPTCHA, CHANGE THE TIMEOUT HERE
 # to 60 seconds, just enough time for you to complete the captcha yourself.
@@ -72,7 +53,7 @@ while True:
         break 
 
 # this class may change, so make sure to inspect the page and find the correct class
-className = "tiktok-1s72ajp-DivWrapper"
+className = "css-1as5cen-DivWrapper e1cg0wnj1"
 
 script  = "let l = [];"
 script += "document.getElementsByClassName(\""
@@ -83,7 +64,7 @@ script += "return l;"
 urlsToDownload = driver.execute_script(script)
 
 print(f"STEP 3: Time to download {len(urlsToDownload)} videos")
-for index, url in enumerate(urlsToDownload):
+for index, link in enumerate(urlsToDownload):
     print(f"Downloading video: {index}")
-    downloadVideo(url, index)
+    downloadVideo(link, index)
     time.sleep(10)
